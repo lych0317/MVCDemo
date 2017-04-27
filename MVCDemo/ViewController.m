@@ -8,12 +8,11 @@
 
 #import "ViewController.h"
 #import "Model.h"
-#import "Person.h"
 #import "View.h"
 
 @interface ViewController ()
 
-@property (nonatomic, strong) Model *model;
+@property (nonatomic, strong) NSArray *personArray;
 @property (nonatomic, strong) View *customView;
 
 @end
@@ -22,27 +21,34 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.model = [[Model alloc] init];
-    [self.model addObserver:self forKeyPath:@"personArray" options:NSKeyValueObservingOptionNew context:nil];
-
     self.customView = [[View alloc] init];
     self.customView.frame = self.view.bounds;
     [self.view addSubview:self.customView];
 
-    [self.model fetchPersonArray];
+    __weak ViewController *weakSelf = self;
+    [self fetchPersonArray:^{
+        [weakSelf updateUI];
+    }];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
-    if ([keyPath isEqualToString:@"personArray"]) {
-        [self updateUI];
+- (void)fetchPersonArray:(void (^)(void))completion {
+    Model *person1 = [Model personWithName:@"aaaaa" age:1];
+    Model *person2 = [Model personWithName:@"bbbbb" age:2];
+    Model *person3 = [Model personWithName:@"ccccc" age:3];
+    Model *person4 = [Model personWithName:@"ddddd" age:4];
+
+    self.personArray = @[person1, person2, person3, person4];
+
+    if (completion) {
+        completion();
     }
 }
 
 - (void)updateUI {
-    self.customView.personName1.text = [self.model.personArray[0] name];
-    self.customView.personName2.text = [self.model.personArray[1] name];
-    self.customView.personName3.text = [self.model.personArray[2] name];
-    self.customView.personName4.text = [self.model.personArray[3] name];
+    self.customView.personName1.text = [self.personArray[0] name];
+    self.customView.personName2.text = [self.personArray[1] name];
+    self.customView.personName3.text = [self.personArray[2] name];
+    self.customView.personName4.text = [self.personArray[3] name];
 }
 
 @end

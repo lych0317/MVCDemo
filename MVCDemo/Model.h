@@ -10,8 +10,9 @@
 
 @interface Model : NSObject
 
-@property (nonatomic, strong) NSArray *personArray;
+@property (nonatomic, copy) NSString *name;
+@property (nonatomic, assign) NSInteger age;
 
-- (void)fetchPersonArray;
++ (instancetype)personWithName:(NSString *)name age:(NSInteger)age;
 
 @end
